@@ -8,12 +8,16 @@ public class Foo {
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition1 = lock.newCondition();
     private final Condition condition2 = lock.newCondition();
+    private final Condition condition3 = lock.newCondition();
 
     public void first() {
         lock.lock();
         try{
+            condition1.await();
             System.out.print("first");
-            condition1.signalAll();
+            condition2.signal();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
@@ -22,9 +26,10 @@ public class Foo {
     public void second() {
         lock.lock();
         try {
-            condition1.await();
+            condition1.signal();
+            condition2.await();
             System.out.print("second");
-            condition2.signalAll();
+            condition3.signal();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -35,9 +40,9 @@ public class Foo {
     public void third() {
         lock.lock();
         try {
-            condition2.await();
+            condition1.signal();
+            condition3.await();
             System.out.print("third");
-            condition2.signalAll();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

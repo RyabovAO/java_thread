@@ -13,8 +13,8 @@ public class Main {
         Thread thread2 = new Thread(foo::second);
         Thread thread3 = new Thread(foo::third);
 
-        thread2.start();
         thread1.start();
+        thread2.start();
         thread3.start();
 
         try {
